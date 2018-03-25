@@ -2,9 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { graphqlExpress, graphiqlExpress } = require("apollo-server-express");
 const { makeExecutableSchema } = require("graphql-tools");
+import chalk from "chalk";
+require("dotenv").config();
 
+const PORT = process.env.PORT || 4010;
 // Some fake data
-const books = [
+const events = [
   {
     title: "Harry Potter and the Sorcerer's stone",
     author: "J.K. Rowling"
@@ -17,13 +20,13 @@ const books = [
 
 // The GraphQL schema in string form
 const typeDefs = `
-  type Query { books: [Book] }
-  type Book { title: String, author: String }
+  type Query { events: [Event] }
+  type Event { title: String, date: String }
 `;
 
 // The resolvers
 const resolvers = {
-  Query: { books: () => books }
+  Query: { events: () => events }
 };
 
 // Put together a schema
@@ -42,6 +45,6 @@ app.use("/graphql", bodyParser.json(), graphqlExpress({ schema }));
 app.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
 
 // Start the server
-app.listen(3000, () => {
-  console.log("Go to http://localhost:3000/graphiql to run queries!");
+app.listen(PORT, () => {
+  console.log(chalk.green(`GraphQl now running on ${PORT}`));
 });
