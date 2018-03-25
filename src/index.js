@@ -9,24 +9,46 @@ const PORT = process.env.PORT || 4010;
 // Some fake data
 const events = [
   {
-    title: "Harry Potter and the Sorcerer's stone",
-    author: "J.K. Rowling"
+    title: "Breakfast",
+    date: new Date(2018, 1, 1).toString()
   },
   {
-    title: "Jurassic Park",
-    author: "Michael Crichton"
+    title: "Tooth Brushing",
+    date: new Date(2018, 2, 1).toString()
+  }
+];
+
+const users = [
+  {
+    id: 1,
+    name: "Andreas",
+    email: "andreas.groos1@gmail.com",
+    eventTypes: ["Breakfast", "Tooth Brushing"],
+    events: []
+  },
+  {
+    id: 2,
+    name: "Mike",
+    email: "mike@gmail.com",
+    eventTypes: ["Breakfast", "Dinner"],
+    events: []
   }
 ];
 
 // The GraphQL schema in string form
 const typeDefs = `
-  type Query { events: [Event] }
-  type Event { title: String, date: String }
+  type Query { events: [Event], users: [User] }
+  type Event { id: ID!, title: String, date: String }
+  type User {id: ID!, name: String, email: String, eventTypes: [EventType], events: [Event]}
+  type EventType {title: String}
 `;
 
 // The resolvers
 const resolvers = {
-  Query: { events: () => events }
+  Query: {
+    events: () => events,
+    users: () => users
+  }
 };
 
 // Put together a schema
