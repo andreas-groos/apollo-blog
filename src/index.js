@@ -38,12 +38,18 @@ const users = [
 ];
 
 // The GraphQL schema in string form
-const typeDefs = `
-  type Query { events: [Event], users: [User], eventType: [EventType] }
+const typeDefs = [
+  `
   type Event { id: ID!, title: String, date: String }
   type User {id: ID!, name: String, email: String, eventTypes: [EventType], events: [Event]}
   type EventType {title: String}
-`;
+  type Input { name: String, email: String}
+  type Query {
+     events: [Event]
+     users: [User]
+     eventType: [EventType] }
+`
+];
 
 // The resolvers
 const resolvers = {
@@ -61,6 +67,13 @@ const resolvers = {
       return result;
     }
   }
+  // Mutation: {
+  //   createUser: args => {
+  //     console.log("root", root);
+  //     console.log("args", args);
+  //     return { name: "Andreas", email: "andreas.groos1@gmail.com" };
+  //   }
+  // }
 };
 
 // Put together a schema
