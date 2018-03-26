@@ -50,7 +50,8 @@ const typeDefs = [
      eventType: [EventType]
      }
   type Mutation {
-    createUser(name: String): User
+    createUser(name: String, email: String): User
+
   }
 `
 ];
@@ -75,8 +76,10 @@ const resolvers = {
     createUser: (root, args) => {
       console.log("root", root);
       console.log("args", args);
-      users.push(users[0]);
-      return users[0];
+      let newUser = { name: args.name, email: args.email };
+      users.push(newUser);
+
+      return newUser;
     }
   }
 };
@@ -101,3 +104,11 @@ app.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
 app.listen(PORT, () => {
   console.log(chalk.blue(`GraphQl now running on ${PORT}`));
 });
+
+// GraohiQl mutation:
+// mutation {
+//   createUser(name: "Mikddel" ,email:"Mike@gmail.com") {
+//     name
+//     email
+//   }
+// }
