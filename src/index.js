@@ -6,6 +6,7 @@ import uniqBy from "lodash/uniqBy";
 import sortBy from "lodash/sortBy";
 import chalk from "chalk";
 import connectMongo from "./connectMongo";
+import { Event, User } from "./Schema";
 
 const PORT = process.env.PORT || 4010;
 // Some fake data
@@ -48,9 +49,11 @@ const typeDefs = [
      events: [Event]
      users: [User]
      eventType: [EventType]
+     user(name: String): User
      }
   type Mutation {
     createUser(name: String, email: String): User
+    addEvent(name: String, event: String): User
 
   }
 `
@@ -60,7 +63,12 @@ const typeDefs = [
 const resolvers = {
   Query: {
     events: () => events,
-    users: () => users,
+    users: () => User.find({}),
+    user: async (root, args) => {
+      let { name } = args;
+      let person = await User.findOne({ name });
+      return person;
+    },
     eventType: () => {
       let result = [];
       users.map(u => {
@@ -73,13 +81,24 @@ const resolvers = {
     }
   },
   Mutation: {
-    createUser: (root, args) => {
+    createUser: async (root, args) => {
       console.log("root", root);
       console.log("args", args);
-      let newUser = { name: args.name, email: args.email };
-      users.push(newUser);
-
+      let { name, email } = args;
+      let newUser = new User({ name, email });
+      await newUser.save();
       return newUser;
+    },
+    addEvent: async (root, args) => {
+      let { name, event } = args;
+      console.log("name", name);
+      console.log("event", event);
+      let person = await User.findOne({ name });
+      console.log("person", person);
+      person.events.push({ title: event });
+      console.log("person", person);
+      await person.save();
+      return person;
     }
   }
 };
