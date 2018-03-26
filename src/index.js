@@ -47,7 +47,11 @@ const typeDefs = [
   type Query {
      events: [Event]
      users: [User]
-     eventType: [EventType] }
+     eventType: [EventType]
+     }
+  type Mutation {
+    createUser(name: String): User
+  }
 `
 ];
 
@@ -66,14 +70,15 @@ const resolvers = {
       result = uniqBy(result, "title");
       return result;
     }
+  },
+  Mutation: {
+    createUser: (root, args) => {
+      console.log("root", root);
+      console.log("args", args);
+      users.push(users[0]);
+      return users[0];
+    }
   }
-  // Mutation: {
-  //   createUser: args => {
-  //     console.log("root", root);
-  //     console.log("args", args);
-  //     return { name: "Andreas", email: "andreas.groos1@gmail.com" };
-  //   }
-  // }
 };
 
 // Put together a schema
