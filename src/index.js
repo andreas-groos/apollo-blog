@@ -5,7 +5,7 @@ const { makeExecutableSchema } = require("graphql-tools");
 import uniqBy from "lodash/uniqBy";
 import sortBy from "lodash/sortBy";
 import chalk from "chalk";
-require("dotenv").config();
+import connectMongo from "./connectMongo";
 
 const PORT = process.env.PORT || 4010;
 // Some fake data
@@ -58,7 +58,6 @@ const resolvers = {
         });
       });
       result = uniqBy(result, "title");
-      console.log("result", result);
       return result;
     }
   }
@@ -73,6 +72,7 @@ const schema = makeExecutableSchema({
 // Initialize the app
 const app = express();
 
+connectMongo();
 // The GraphQL endpoint
 app.use("/graphql", bodyParser.json(), graphqlExpress({ schema }));
 
@@ -81,5 +81,5 @@ app.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(chalk.green(`GraphQl now running on ${PORT}`));
+  console.log(chalk.blue(`GraphQl now running on ${PORT}`));
 });

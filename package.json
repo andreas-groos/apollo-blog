@@ -28,6 +28,7 @@
     "graphql": "^0.13.2",
     "graphql-tools": "^2.23.1",
     "lodash": "^4.17.5",
+    "mongoose": "^5.0.11",
     "nodemon": "^1.17.2"
   },
   "babel": {
