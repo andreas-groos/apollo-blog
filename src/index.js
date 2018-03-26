@@ -2,6 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { graphqlExpress, graphiqlExpress } = require("apollo-server-express");
 const { makeExecutableSchema } = require("graphql-tools");
+import uniqBy from "lodash/uniqBy";
+import sortBy from "lodash/sortBy";
 import chalk from "chalk";
 require("dotenv").config();
 
@@ -37,7 +39,7 @@ const users = [
 
 // The GraphQL schema in string form
 const typeDefs = `
-  type Query { events: [Event], users: [User] }
+  type Query { events: [Event], users: [User], eventType: [EventType] }
   type Event { id: ID!, title: String, date: String }
   type User {id: ID!, name: String, email: String, eventTypes: [EventType], events: [Event]}
   type EventType {title: String}
@@ -47,7 +49,18 @@ const typeDefs = `
 const resolvers = {
   Query: {
     events: () => events,
-    users: () => users
+    users: () => users,
+    eventType: () => {
+      let result = [];
+      users.map(u => {
+        u.eventTypes.map(e => {
+          result.push({ title: e });
+        });
+      });
+      result = uniqBy(result, "title");
+      console.log("result", result);
+      return result;
+    }
   }
 };
 
