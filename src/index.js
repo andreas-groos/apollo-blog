@@ -13,9 +13,10 @@ const PORT = process.env.PORT || 4010;
 // The GraphQL schema in string form
 const typeDefs = [
   `
-  type Post { id: ID!, authorName: String,title: String, date: String, blogText: String, likes: Int }
-  type Author {id: ID!, name: String, email: String, posts: [Post] }
-  type User {id: ID!, name: String, email: String}
+  type Post { id: ID!, authorName: String,title: String, date: String, blogText: String, likes: Int , comments: [Comment] ,createdAt: String, updatedAt: String}
+  type postID { id: ID!}
+  type Author {id: ID!, name: String, email: String, postsID: [postID], createdAt: String, updatedAt: String }
+  type User {id: ID!, name: String, email: String, createdAt: String, updatedAt: String}
   type  Comment {text: String, date: String}
   type Query {
      authors: [Author]
@@ -53,8 +54,17 @@ const resolvers = {
     createUser: async (root, args) => {
       let { name, email } = args;
       let newUser = new User({ name, email });
-      await newUser.save();
-      return newUser;
+      let final = await newUser
+        .createUser()
+        .then(async returnedResult => {
+          console.log("returnedResult", returnedResult);
+          return returnedResult;
+        })
+        .catch(err => {
+          console.log("ERROR!", err);
+          return null;
+        });
+      return final;
     },
     createAuthor: async (root, args) => {
       let { name, email } = args;
