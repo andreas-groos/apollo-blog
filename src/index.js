@@ -7,9 +7,13 @@ import sortBy from "lodash/sortBy";
 import chalk from "chalk";
 import connectMongo from "./connectMongo";
 import { Post, Author, Comment, Like, User } from "./Schema";
+import { createError, formatError } from "apollo-errors";
 
 const PORT = process.env.PORT || 4010;
 
+const customError = createError("custom errror", {
+  message: "validation error"
+});
 // The GraphQL schema in string form
 const typeDefs = [
   `
@@ -53,13 +57,13 @@ const resolvers = {
   Mutation: {
     createUser: async (root, args) => {
       let { name, email } = args;
-
       return new User({ name, email })
         .createUser()
         .then(newUser => newUser)
         .catch(err => {
-          console.log("ERROR!", err);
-          return null;
+          throw new customError({
+            data: { type: err }
+          });
         });
     },
     createAuthor: async (root, args) => {
@@ -88,7 +92,7 @@ const app = express();
 
 connectMongo();
 // The GraphQL endpoint
-app.use("/graphql", bodyParser.json(), graphqlExpress({ schema }));
+app.use("/graphql", bodyParser.json(), graphqlExpress({ formatError, schema }));
 
 // GraphiQL, a visual editor for queries
 app.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));

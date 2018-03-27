@@ -11,6 +11,9 @@ let userSchema = new Schema({
 
 userSchema.methods.createUser = async function(name, email) {
   return new Promise((resolve, reject) => {
+    if (this.email.length === 0 || this.name.length === 0) {
+      throw "email and name are necessary";
+    }
     Promise.all([
       User.findOne({ name: this.name }),
       User.findOne({ email: this.email })
@@ -20,11 +23,10 @@ userSchema.methods.createUser = async function(name, email) {
         if (!res[0] && !res[1]) {
           await this.save();
           resolve(this);
-        } else reject("user/email already exists");
+        } else throw "email/name already exists";
       })
       .catch(err => {
-        console.log(err);
-        reject("something went wrong");
+        reject(err);
       });
   });
 };
