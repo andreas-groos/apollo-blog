@@ -53,18 +53,14 @@ const resolvers = {
   Mutation: {
     createUser: async (root, args) => {
       let { name, email } = args;
-      let newUser = new User({ name, email });
-      let final = await newUser
+
+      return new User({ name, email })
         .createUser()
-        .then(async returnedResult => {
-          console.log("returnedResult", returnedResult);
-          return returnedResult;
-        })
+        .then(newUser => newUser)
         .catch(err => {
           console.log("ERROR!", err);
           return null;
         });
-      return final;
     },
     createAuthor: async (root, args) => {
       let { name, email } = args;

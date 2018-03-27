@@ -9,13 +9,14 @@ let userSchema = new Schema({
   updatedAt: Date
 });
 
-userSchema.methods.createUser = async function() {
+userSchema.methods.createUser = async function(name, email) {
   return new Promise((resolve, reject) => {
-    let duplicateUserName = User.findOne({ name: this.name });
-    let duplicateUserEmail = User.findOne({ email: this.email });
-    Promise.all([duplicateUserName, duplicateUserEmail])
+    Promise.all([
+      User.findOne({ name: this.name }),
+      User.findOne({ email: this.email })
+    ])
       .then(async res => {
-        console.log("res", res);
+        //   Check for duplicates
         if (!res[0] && !res[1]) {
           await this.save();
           resolve(this);
@@ -23,7 +24,7 @@ userSchema.methods.createUser = async function() {
       })
       .catch(err => {
         console.log(err);
-        reject("something wrong");
+        reject("something went wrong");
       });
   });
 };
