@@ -6,55 +6,29 @@ import uniqBy from "lodash/uniqBy";
 import sortBy from "lodash/sortBy";
 import chalk from "chalk";
 import connectMongo from "./connectMongo";
-import { Event, User } from "./Schema";
+import { Post, Author, Comment, Like, User } from "./Schema";
 
 const PORT = process.env.PORT || 4010;
-// Some fake data
-const events = [
-  {
-    title: "Breakfast",
-    date: new Date(2018, 1, 1).toString()
-  },
-  {
-    title: "Tooth Brushing",
-    date: new Date(2018, 2, 1).toString()
-  }
-];
-
-const users = [
-  {
-    id: 1,
-    name: "Andreas",
-    email: "andreas.groos1@gmail.com",
-    eventTypes: ["Breakfast", "Tooth Brushing"],
-    events: []
-  },
-  {
-    id: 2,
-    name: "Mike",
-    email: "mike@gmail.com",
-    eventTypes: ["Breakfast", "Dinner"],
-    events: []
-  }
-];
 
 // The GraphQL schema in string form
 const typeDefs = [
   `
-  type Event { id: ID!, title: String, date: String }
-  type User {id: ID!, name: String, email: String, eventTypes: [EventType], events: [Event]}
-  type EventType {title: String}
-  type Input { name: String, email: String}
+  type Post { id: ID!, authorName: String,title: String, date: String, blogText: String, likes: Int }
+  type Author {id: ID!, name: String, email: String, posts: [Post] }
+  type User {id: ID!, name: String, email: String}
+  type  Comment {text: String, date: String}
   type Query {
-     events: [Event]
+     authors: [Author]
      users: [User]
-     eventType: [EventType]
-     user(name: String): User
+     posts(authorName: String): [Post]
+     user(userName: String): [Comment]
      }
   type Mutation {
     createUser(name: String, email: String): User
-    addEvent(name: String, event: String): User
-
+    createAuthor(name: String, email: String): Author
+    createPost(authorName: String, title: String, blogText: String): Post
+    # createComment(userName: String, text: String): Post
+    # addLike(userName: String, postID: ID): Post
   }
 `
 ];
@@ -62,43 +36,37 @@ const typeDefs = [
 // The resolvers
 const resolvers = {
   Query: {
-    events: () => events,
     users: () => User.find({}),
-    user: async (root, args) => {
-      let { name } = args;
-      let person = await User.findOne({ name });
-      return person;
+    authors: () => Author.find({}),
+    posts: async (root, args) => {
+      let { authorName } = args;
+      let author = await Author.find({ name: authorName });
+      return author.posts;
     },
-    eventType: () => {
-      let result = [];
-      users.map(u => {
-        u.eventTypes.map(e => {
-          result.push({ title: e });
-        });
-      });
-      result = uniqBy(result, "title");
-      return result;
+    user: async (root, args) => {
+      let { userName } = args;
+      let user = await User.find({ name: userName });
+      return user;
     }
   },
   Mutation: {
     createUser: async (root, args) => {
-      console.log("root", root);
-      console.log("args", args);
       let { name, email } = args;
       let newUser = new User({ name, email });
       await newUser.save();
       return newUser;
     },
-    addEvent: async (root, args) => {
-      let { name, event } = args;
-      console.log("name", name);
-      console.log("event", event);
-      let person = await User.findOne({ name });
-      console.log("person", person);
-      person.events.push({ title: event });
-      console.log("person", person);
-      await person.save();
-      return person;
+    createAuthor: async (root, args) => {
+      let { name, email } = args;
+      let newAuthor = new Author({ name, email, posts: [] });
+      await newAuthor.save();
+      return newAuthor;
+    },
+    createPost: async (root, args) => {
+      let { authorName, title, blogText } = args;
+      let newPost = new Post({ authorName, title, blogText, date: new Date() });
+      await newPost.save();
+      return newPost;
     }
   }
 };
@@ -124,9 +92,10 @@ app.listen(PORT, () => {
   console.log(chalk.blue(`GraphQl now running on ${PORT}`));
 });
 
-// GraohiQl mutation:
+// GraphiQl mutation:
+
 // mutation {
-//   createUser(name: "Mikddel" ,email:"Mike@gmail.com") {
+//   createUser(name: "Andreas",email: "andreas.groos1@gmail.com") {
 //     name
 //     email
 //   }
