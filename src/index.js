@@ -8,12 +8,9 @@ import chalk from "chalk";
 import connectMongo from "./connectMongo";
 import { Post, Author, Comment, Like, User } from "./Schema";
 import { createError, formatError } from "apollo-errors";
-
+import { saveUser } from "./Connectors";
 const PORT = process.env.PORT || 4010;
 
-const customError = createError("custom errror", {
-  message: "validation error"
-});
 // The GraphQL schema in string form
 const typeDefs = [
   `
@@ -57,14 +54,10 @@ const resolvers = {
   Mutation: {
     createUser: async (root, args) => {
       let { name, email } = args;
-      return new User({ name, email })
-        .createUser()
-        .then(newUser => newUser)
-        .catch(err => {
-          throw new customError({
-            data: { type: err }
-          });
-        });
+      let { newUser, error } = await saveUser(name, email);
+      if (newUser) {
+        return newUser;
+      } else return null;
     },
     createAuthor: async (root, args) => {
       let { name, email } = args;
