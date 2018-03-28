@@ -1,3 +1,3 @@
 import { saveUser } from "./user";
-
-export { saveUser };
+import { saveAuthor } from "./author";
+export { saveUser, saveAuthor };

@@ -9,6 +9,8 @@ import connectMongo from "./connectMongo";
 import { Post, Author, Comment, Like, User } from "./Schema";
 import { createError, formatError } from "apollo-errors";
 import { saveUser } from "./Connectors";
+import { saveAuthor } from "./Connectors";
+
 const PORT = process.env.PORT || 4010;
 
 // The GraphQL schema in string form
@@ -55,9 +57,7 @@ const resolvers = {
     createUser: async (root, args) => {
       let { name, email } = args;
       let { newUser, error } = await saveUser(name, email);
-      if (newUser) {
-        return newUser;
-      } else return null;
+      return newUser;
     },
     createAuthor: async (root, args) => {
       let { name, email } = args;
