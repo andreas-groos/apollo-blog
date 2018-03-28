@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const { graphqlExpress, graphiqlExpress } = require("apollo-server-express");
 const { makeExecutableSchema } = require("graphql-tools");
 import uniqBy from "lodash/uniqBy";
@@ -7,7 +8,6 @@ import sortBy from "lodash/sortBy";
 import chalk from "chalk";
 import connectMongo from "./connectMongo";
 import { Post, Author, Comment, Like, User } from "./Schema";
-import { createError, formatError } from "apollo-errors";
 import { saveUser, saveAuthor, savePost } from "./Connectors";
 
 const PORT = process.env.PORT || 4010;
@@ -80,9 +80,11 @@ const schema = makeExecutableSchema({
 // Initialize the app
 const app = express();
 
+app.use(cors());
+
 connectMongo();
 // The GraphQL endpoint
-app.use("/graphql", bodyParser.json(), graphqlExpress({ formatError, schema }));
+app.use("/graphql", bodyParser.json(), graphqlExpress({ schema }));
 
 // GraphiQL, a visual editor for queries
 app.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
