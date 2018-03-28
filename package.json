@@ -30,7 +30,8 @@
     "graphql-tools": "^2.23.1",
     "lodash": "^4.17.5",
     "mongoose": "^5.0.11",
-    "nodemon": "^1.17.2"
+    "nodemon": "^1.17.2",
+    "shortid": "^2.2.8"
   },
   "babel": {
     "presets": [

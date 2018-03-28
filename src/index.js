@@ -8,15 +8,14 @@ import chalk from "chalk";
 import connectMongo from "./connectMongo";
 import { Post, Author, Comment, Like, User } from "./Schema";
 import { createError, formatError } from "apollo-errors";
-import { saveUser } from "./Connectors";
-import { saveAuthor } from "./Connectors";
+import { saveUser, saveAuthor, savePost } from "./Connectors";
 
 const PORT = process.env.PORT || 4010;
 
 // The GraphQL schema in string form
 const typeDefs = [
   `
-  type Post { id: ID!, authorName: String,title: String, date: String, blogText: String, likes: Int , comments: [Comment] ,createdAt: String, updatedAt: String}
+  type Post { id: ID!, authorName: String,title: String, blogText: String, likes: Int , comments: [Comment] ,createdAt: String, updatedAt: String}
   type postID { id: ID!}
   type Author {id: ID!, name: String, email: String, postsID: [postID], createdAt: String, updatedAt: String }
   type User {id: ID!, name: String, email: String, createdAt: String, updatedAt: String}
@@ -61,14 +60,12 @@ const resolvers = {
     },
     createAuthor: async (root, args) => {
       let { name, email } = args;
-      let newAuthor = new Author({ name, email, posts: [] });
-      await newAuthor.save();
+      let { newAuthor, error } = await saveAuthor(name, email);
       return newAuthor;
     },
     createPost: async (root, args) => {
       let { authorName, title, blogText } = args;
-      let newPost = new Post({ authorName, title, blogText, date: new Date() });
-      await newPost.save();
+      let { newPost, error } = await savePost(authorName, title, blogText);
       return newPost;
     }
   }
