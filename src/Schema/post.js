@@ -10,6 +10,7 @@ let postSchema = new Schema({
   title: String,
   blogText: String,
   likes: Number,
+  likesBy: [String],
   comments: [commentSchema],
   createdAt: Date,
   updatedAt: Date
@@ -25,6 +26,7 @@ postSchema.methods.createPost = async function() {
     this.id = shortid.generate();
     this.likes = 0;
     this.comments = [];
+    this.likesBy = [];
     // author.postsID.push({ id: this.id });
     // await author.save();
     await this.save();
@@ -36,10 +38,18 @@ postSchema.methods.createPost = async function() {
   });
 };
 
+// NOTE: user is firebase auth uid!
 postSchema.methods.addLike = async function(user) {
-  this.likes++;
-  await this.save();
-  return this;
+  console.log("user", user);
+  console.log("this.likesBy", this.likesBy);
+  if (!this.likesBy.includes(user)) {
+    this.likes++;
+    this.likesBy.push(user);
+    await this.save();
+    return this;
+  } else {
+    return null;
+  }
 };
 
 postSchema.pre("save", function(next) {

@@ -16,10 +16,10 @@ const PORT = process.env.PORT || 4010;
 const typeDefs = [
   `
   type Comment {text: String, date: String}
-  type Post { id: String, authorName: String,title: String, blogText: String, likes: Int , comments: [Comment] ,createdAt: String, updatedAt: String}
+  type Post { id: String, authorName: String,title: String, blogText: String, likes: Int , likesBy: [String] , comments: [Comment] ,createdAt: String, updatedAt: String}
   type postID { id: ID!}
   type Author {id: ID!, name: String, email: String, postsID: [postID], createdAt: String, updatedAt: String }
-  type User {id: ID, name: String, email: String, createdAt: String, updatedAt: String}
+  type User {id: String, name: String, email: String, createdAt: String, updatedAt: String}
   type Query {
      authors: [Author]
      users: [User]
@@ -28,7 +28,7 @@ const typeDefs = [
      user(userName: String): [Comment]
      }
   type Mutation {
-    createUser(name: String, email: String): User
+    createUser(name: String, email: String, uid: String): User
     createAuthor(name: String, email: String): Author
     createPost(authorName: String, title: String, blogText: String): Post
     # createComment(userName: String, text: String): Post
@@ -43,15 +43,12 @@ const resolvers = {
     users: () => User.find({}),
     authors: () => Author.find({}),
     posts: async (root, args) => {
-      console.log("getting all posts");
       let posts = await Post.find({});
       return posts;
     },
     post: async (root, args) => {
       let { id } = args;
-      console.log("id", id);
       let post = await Post.findOne({ id });
-      console.log("post", post);
       return post;
     },
     user: async (root, args) => {
@@ -62,8 +59,9 @@ const resolvers = {
   },
   Mutation: {
     createUser: async (root, args) => {
-      let { name, email } = args;
-      let { newUser, error } = await saveUser(name, email);
+      let { name, email, uid } = args;
+      console.log("uid in mutation", uid);
+      let { newUser, error } = await saveUser(name, email, uid);
       return newUser;
     },
     createAuthor: async (root, args) => {
@@ -73,14 +71,12 @@ const resolvers = {
     },
     createPost: async (root, args) => {
       let { authorName, title, blogText } = args;
-
       let { newPost, error } = await savePost(authorName, title, blogText);
       return newPost;
     },
     addLike: async (root, args) => {
       let { id, user } = args;
       let result = await addLike(id, user);
-      console.log("result", result);
       return result;
     }
   }
