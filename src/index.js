@@ -18,7 +18,7 @@ const typeDefs = [
   type Post { id: ID!, authorName: String,title: String, blogText: String, likes: Int , comments: [Comment] ,createdAt: String, updatedAt: String}
   type postID { id: ID!}
   type Author {id: ID!, name: String, email: String, postsID: [postID], createdAt: String, updatedAt: String }
-  type User {id: ID!, name: String, email: String, createdAt: String, updatedAt: String}
+  type User {id: ID, name: String, email: String, createdAt: String, updatedAt: String}
   type  Comment {text: String, date: String}
   type Query {
      authors: [Author]
@@ -42,9 +42,8 @@ const resolvers = {
     users: () => User.find({}),
     authors: () => Author.find({}),
     posts: async (root, args) => {
-      let { authorName } = args;
-      let author = await Author.find({ name: authorName });
-      return author.posts;
+      let posts = await Post.find({});
+      return posts;
     },
     user: async (root, args) => {
       let { userName } = args;

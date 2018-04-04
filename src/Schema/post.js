@@ -20,18 +20,19 @@ postSchema.methods.createPost = async function() {
     if (this.title.length === 0 || this.blogText.length === 0) {
       throw "title and text are necessary";
     }
-    let author = await Author.findOne({ name: this.authorName });
-    if (author) {
-      this.id = shortid.generate();
-      this.likes = 0;
-      this.comments = [];
-      author.postsID.push({ id: this.id });
-      await author.save();
-      await this.save();
-      resolve(this);
-    } else {
-      reject("author doesn't exist");
-    }
+    // let author = await Author.findOne({ name: this.authorName });
+    // if (author) {
+    this.id = shortid.generate();
+    this.likes = 0;
+    this.comments = [];
+    // author.postsID.push({ id: this.id });
+    // await author.save();
+    await this.save();
+    resolve(this);
+    // }
+    // else {
+    //   reject("author doesn't exist");
+    // }
   });
 };
 postSchema.pre("save", function(next) {
