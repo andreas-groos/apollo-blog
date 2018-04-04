@@ -35,6 +35,13 @@ postSchema.methods.createPost = async function() {
     // }
   });
 };
+
+postSchema.methods.addLike = async function(user) {
+  this.likes++;
+  await this.save();
+  return this;
+};
+
 postSchema.pre("save", function(next) {
   this.updatedAt = new Date();
   if (!this.createdAt) {

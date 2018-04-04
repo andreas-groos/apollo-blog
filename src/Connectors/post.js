@@ -13,4 +13,23 @@ const savePost = (authorName, title, blogText) => {
     });
 };
 
-export { savePost };
+const addLike = async (id, user) => {
+  return new Promise(async (resolve, reject) => {
+    await Post.findOne({ id })
+      .then(async post => {
+        if (post) {
+          return post.addLike(user);
+        } else {
+          throw new Error(`post ID doesn't exist`);
+        }
+      })
+      .then(res => {
+        console.log("res", res);
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+};
+export { savePost, addLike };
