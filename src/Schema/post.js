@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 import shortid from "shortid";
 import { commentSchema } from "./comment";
 import Author from "./author";
+import { createError } from "apollo-errors";
+
+export const customError = createError("CustomError", {
+  message: "customError"
+});
 
 let postSchema = new Schema({
   id: String,
@@ -40,15 +45,17 @@ postSchema.methods.createPost = async function() {
 
 // NOTE: user is firebase auth uid!
 postSchema.methods.addLike = async function(user) {
-  console.log("user", user);
-  console.log("this.likesBy", this.likesBy);
   if (!this.likesBy.includes(user)) {
     this.likes++;
     this.likesBy.push(user);
     await this.save();
     return this;
   } else {
-    return null;
+    return new customError({
+      data: {
+        message: "You already liked this post"
+      }
+    });
   }
 };
 

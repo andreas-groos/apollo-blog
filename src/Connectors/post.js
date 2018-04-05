@@ -24,7 +24,6 @@ const addLike = async (id, user) => {
         }
       })
       .then(res => {
-        console.log("res", res);
         resolve(res);
       })
       .catch(err => {

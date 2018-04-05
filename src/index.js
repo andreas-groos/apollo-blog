@@ -9,6 +9,7 @@ import chalk from "chalk";
 import connectMongo from "./connectMongo";
 import { Post, Author, Comment, Like, User } from "./Schema";
 import { saveUser, saveAuthor, savePost, addLike } from "./Connectors";
+import { formatError } from "apollo-errors";
 
 const PORT = process.env.PORT || 4010;
 
@@ -95,7 +96,7 @@ app.use(cors());
 
 connectMongo();
 // The GraphQL endpoint
-app.use("/graphql", bodyParser.json(), graphqlExpress({ schema }));
+app.use("/graphql", bodyParser.json(), graphqlExpress({ formatError, schema }));
 
 // GraphiQL, a visual editor for queries
 app.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
