@@ -31,4 +31,15 @@ const addLike = async (id, user) => {
       });
   });
 };
-export { savePost, addLike };
+
+const addComment = async (text, user, id) => {
+  console.log(text, user, id, "----------------");
+  await Post.findOne({ id }).then(async post => {
+    if (post) {
+      let result = await post.addComment(text, user);
+      console.log("result addComment", result);
+      return result;
+    }
+  });
+};
+export { savePost, addLike, addComment };
