@@ -4,7 +4,7 @@ import { userSchema } from "./user";
 
 let commentSchema = new Schema({
   text: String,
-  user: userSchema,
+  user: String, // use userSchema maybe?
   date: Date
 });
 

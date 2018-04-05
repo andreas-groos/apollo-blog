@@ -8,7 +8,13 @@ import sortBy from "lodash/sortBy";
 import chalk from "chalk";
 import connectMongo from "./connectMongo";
 import { Post, Author, Comment, Like, User } from "./Schema";
-import { saveUser, saveAuthor, savePost, addLike } from "./Connectors";
+import {
+  saveUser,
+  saveAuthor,
+  savePost,
+  addLike,
+  addComment
+} from "./Connectors";
 import { formatError } from "apollo-errors";
 
 const PORT = process.env.PORT || 4010;
@@ -16,7 +22,7 @@ const PORT = process.env.PORT || 4010;
 // The GraphQL schema in string form
 const typeDefs = [
   `
-  type Comment {text: String, date: String}
+  type Comment {text: String, date: String, user: String}
   type Post { id: String, authorName: String,title: String, blogText: String, likes: Int , likesBy: [String] , comments: [Comment] ,createdAt: String, updatedAt: String}
   type postID { id: ID!}
   type Author {id: ID!, name: String, email: String, postsID: [postID], createdAt: String, updatedAt: String }
@@ -32,7 +38,7 @@ const typeDefs = [
     createUser(name: String, email: String, uid: String): User
     createAuthor(name: String, email: String): Author
     createPost(authorName: String, title: String, blogText: String): Post
-    # createComment(userName: String, text: String): Post
+    addComment(user: String, text: String, id: String): Comment
     addLike(id: String, user: String): Post
   }
 `
@@ -78,6 +84,11 @@ const resolvers = {
     addLike: async (root, args) => {
       let { id, user } = args;
       let result = await addLike(id, user);
+      return result;
+    },
+    addComment: async (root, args) => {
+      let { user, text, id } = args;
+      let result = await addComment(text, user, id);
       return result;
     }
   }

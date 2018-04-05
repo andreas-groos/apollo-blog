@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 import shortid from "shortid";
 import { commentSchema } from "./comment";
 import Author from "./author";
+import { Comment } from "./comment";
 import { createError } from "apollo-errors";
 
 export const customError = createError("CustomError", {
@@ -57,6 +58,12 @@ postSchema.methods.addLike = async function(user) {
       }
     });
   }
+};
+
+postSchema.methods.addComment = async function(text, user) {
+  this.comments.push(new Comment({ text, user, date: new Date() }));
+  await this.save();
+  return this;
 };
 
 postSchema.pre("save", function(next) {
