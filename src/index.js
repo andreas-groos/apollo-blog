@@ -31,6 +31,7 @@ const typeDefs = [
      authors: [Author]
      users: [User]
      posts: [Post]
+     postsByUser(name: String): [Post]
      post(id: String!): Post
      user(userName: String): [Comment]
      }
@@ -53,14 +54,27 @@ const resolvers = {
       let posts = await Post.find({});
       return posts;
     },
+    postsByUser: async (root, args) => {
+      let { name } = args;
+      let posts = await Post.find({
+        authorName: name
+      });
+      console.log("name", name);
+      console.log("posts", posts);
+      return posts;
+    },
     post: async (root, args) => {
       let { id } = args;
-      let post = await Post.findOne({ id });
+      let post = await Post.findOne({
+        id
+      });
       return post;
     },
     user: async (root, args) => {
       let { userName } = args;
-      let user = await User.find({ name: userName });
+      let user = await User.find({
+        name: userName
+      });
       return user;
     }
   },
@@ -107,10 +121,22 @@ app.use(cors());
 
 connectMongo();
 // The GraphQL endpoint
-app.use("/graphql", bodyParser.json(), graphqlExpress({ formatError, schema }));
+app.use(
+  "/graphql",
+  bodyParser.json(),
+  graphqlExpress({
+    formatError,
+    schema
+  })
+);
 
 // GraphiQL, a visual editor for queries
-app.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
+app.use(
+  "/graphiql",
+  graphiqlExpress({
+    endpointURL: "/graphql"
+  })
+);
 
 // Start the server
 app.listen(PORT, () => {});
